@@ -1,4 +1,7 @@
-sqlalchemy
-fastapi
-mysql-connector-python
+sqlalchemy~=2.0.29
+fastapi~=0.110.1
+mysql-connector-python~=8.3.0
 uvicorn[standard]
+passlib~=1.7.4
+pydantic~=2.7.0
+pyjwt
