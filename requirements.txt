@@ -1,0 +1,4 @@
+sqlalchemy
+fastapi
+mysql-connector-python
+uvicorn[standard]
