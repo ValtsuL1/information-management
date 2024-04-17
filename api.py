@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+import jwt
+from fastapi import FastAPI, HTTPException, Header
 from sqlalchemy import text
 from pydantic import BaseModel
 from db import DW
@@ -10,6 +11,39 @@ app = FastAPI()
 class RegisterRequest(BaseModel):
     username: str
     password: str
+
+
+SECRET_KEY = 'ojg4io2jna0921pionmmlvlkjneae9p4tjn984qvmajfm809u4q3980+09093quk0qu+09t098au+´0g8qbmn00938mn5+´09q35mb'
+
+
+@app.get('/api/account')
+async def get_account(dw: DW, authorzation = Header(None)):
+    try:
+        split_header = authorzation.split(' ')
+        if len(split_header) == 2 and split_header[0] == 'Bearer':
+            token = split_header[1]
+            validated = jwt.decode(token, SECRET_KEY, algorithms=['HS512'])
+            user = dw.execute(text('SELECT username FROM users WHERE id = :id'),
+                              {'id': validated['id']}).mappings().first()
+            if user is None:
+                raise HTTPException(status_code=404, detail='user not found')
+            return user
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post('/api/login')
+async def login(dw: DW, req: RegisterRequest):
+    _query = text("SELECT * FROM users WHERE username = :username")
+    user = dw.execute(_query, {'username': req.username}).mappings().first()
+    if user is None:
+        raise HTTPException(status_code=404, detail='user not found')
+
+    password_correct = pl.verify(req.password, user['password'])
+    if password_correct:
+        token = jwt.encode({'id': user['id']}, SECRET_KEY, algorithm='HS512')
+        return {'token': token}
+    raise HTTPException(status_code=404, detail='user not found')
 
 
 @app.post('/api/register')
