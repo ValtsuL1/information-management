@@ -29,6 +29,7 @@ def search_by_rents():
             result.sort()
             counts = dict(Counter(result))
 
+            print(f"Lainaukset vuodelta {search_year}:")
             for month, amount in counts.items():
                 print(f"{months[month - 1]}: {amount} kpl")
 
@@ -40,21 +41,23 @@ def search_by_rents():
                 for transaction in transactions:
                     if transaction['year'] == search_year and transaction['month'] == search_month:
                         result.append(transaction['week'])
-            result.sort()
-            counts = dict(Counter(result))
+                result.sort()
+                counts = dict(Counter(result))
 
-            for week, amount in counts.items():
-                print(f"Viikko {week}: {amount} kpl")
+                print(f"Lainaukset {months[search_month - 1]}lta vuodelta {search_year} viikoittain:")
+                for week, amount in counts.items():
+                    print(f"Viikko {week}: {amount} kpl")
 
             if decision == 2:
                 for transaction in transactions:
                     if transaction['year'] == search_year and transaction['month'] == search_month:
                         result.append(transaction['day'])
-            result.sort()
-            counts = dict(Counter(result))
+                result.sort()
+                counts = dict(Counter(result))
 
-            for day, amount in counts.items():
-                print(f"Päivä {day}: {amount} kpl")
+                print(f"Lainaukset {months[search_month - 1]}lta vuodelta {search_year} päivittäin:")
+                for day, amount in counts.items():
+                    print(f"Päivä {day}: {amount} kpl")
 
 
 def search_by_items():
@@ -69,11 +72,13 @@ def search_by_items():
                     result.append(date['month'])
             result.sort()
             counts = dict(Counter(result))
-            print(counts)
-            highest_month = max(zip(counts.values(), counts.keys()))[1]
-            highest_month_amount = counts[highest_month]
-
-            print(f"Vuosi {search_year} {months[highest_month - 1]}: {highest_month_amount}")
+            if len(counts) > 0:
+                highest_month = max(zip(counts.values(), counts.keys()))[1]
+                highest_month_amount = counts[highest_month]
+                print(f"Vuonna {search_year} tavaroita lisättiin eniten:")
+                print(f"{months[highest_month - 1]}: {highest_month_amount} kpl")
+            else:
+                print(f"Vuonna {search_year} järjestelmään ei lisätty tavaroita")
 
         if decision == 2:
             decision = int(input("[1] Vuodelta [2] Koko aikana\n"))
@@ -84,6 +89,7 @@ def search_by_items():
                 printed_list = []
                 # lisää index muuttujaa 1 joka iteraatiossa, jos index on 10 tai alle tulostaa indexin, joka toimii järjestyslukuna, ja tuotteen tiedot
                 # lisäksi kuukausi printataan jos se ei ole printed_list listassa, samalla index palautetaan 1
+                print(f"Lainatuimmat tavarat vuodelta {search_year}:")
                 for item in rented_items:
                     index += 1
                     if item['month'] not in printed_list:
@@ -98,6 +104,7 @@ def search_by_items():
             if decision == 2:
                 rented_items = _get_rented_items_all_time(_dw)
                 i = 0
+                print("Kaikkien aikojen lainatuimmat tavarat:")
                 for item in rented_items:
                     i += 1
                     if i > 10:
